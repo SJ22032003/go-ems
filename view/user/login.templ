@@ -1,7 +1,12 @@
-package user
+package user_templ
+
+import "github.com/SJ22032003/go-ems/view/layout/base"
+
 
 templ Login() {
-	<div>
-		<h1>Login</h1>
-	</div>
+	@layout.Base() {
+		<div>
+			<h1>Login</h1>
+		</div>
+	}
 }

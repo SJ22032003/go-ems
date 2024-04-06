@@ -6,6 +6,7 @@ import (
 	model "github.com/SJ22032003/go-ems/models"
 	service "github.com/SJ22032003/go-ems/services"
 	util "github.com/SJ22032003/go-ems/utils"
+	user_templ "github.com/SJ22032003/go-ems/view/user"
 	gin "github.com/gin-gonic/gin"
 )
 
@@ -13,7 +14,7 @@ const (
 	USER_ALREADY_EXISTS_ERR = "UNIQUE constraint failed: users.email"
 )
 
-type UserHandler struct {}
+type UserHandler struct{}
 
 func (u *UserHandler) CreateUser(ctx *gin.Context) {
 	user := model.User{}
@@ -109,4 +110,9 @@ func (u *UserHandler) LoginUser(ctx *gin.Context) {
 		"auth_token": token,
 	})
 
+}
+
+func (u *UserHandler) RenderLoginPage(ctx *gin.Context) {
+	render := util.NewTempl(ctx, http.StatusOK, user_templ.Login())
+	ctx.Render(http.StatusOK, render)
 }

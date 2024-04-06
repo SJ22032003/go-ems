@@ -11,4 +11,5 @@ func UserRoutes(server *gin.Engine, v *gin.RouterGroup) {
 
 	v.POST("/sign-up", userHandler.CreateUser)
 	v.POST("/login", userHandler.LoginUser)
+	v.GET("/login-page", userHandler.RenderLoginPage)
 }
