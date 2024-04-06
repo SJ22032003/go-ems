@@ -19,7 +19,7 @@ func CreateUser(ctx *gin.Context) {
 
 	err := ctx.ShouldBindJSON(&user)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"message": "Bad Request, Please check the request body and try again.",
 			"error":   err.Error(),
 		})
@@ -28,7 +28,7 @@ func CreateUser(ctx *gin.Context) {
 
 	user.Password, err = util.HashPassword(user.Password)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Internal Server Error",
 			"error":   err.Error(),
 		})
@@ -38,13 +38,13 @@ func CreateUser(ctx *gin.Context) {
 	newUser, err := service.CreateUserService(&user)
 	if err != nil {
 		if err.Error() == USER_ALREADY_EXISTS_ERR {
-			ctx.JSON(http.StatusBadRequest, gin.H{
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"message": "User with this email already exists",
 				"error":   err.Error(),
 			})
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Internal Server Error",
 			"error":   err.Error(),
 		})
@@ -69,7 +69,7 @@ func LoginUser(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&loginUser)
 	println(loginUser.Email)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"message": "Bad Request, Please check the request body and try again.",
 			"error":   err.Error(),
 		})
@@ -78,7 +78,7 @@ func LoginUser(ctx *gin.Context) {
 
 	user, err := service.FindOneUserByEmail(loginUser.Email)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
 			"message": "User not found",
 			"error":   err.Error(),
 		})
@@ -87,7 +87,7 @@ func LoginUser(ctx *gin.Context) {
 
 	isPasswordValid := util.CheckPasswordHash(loginUser.Password, user.Password)
 	if !isPasswordValid {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"message": "Invalid Password",
 		})
 		return
@@ -95,7 +95,7 @@ func LoginUser(ctx *gin.Context) {
 
 	token, err := util.GetSignedToken(*user)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Internal Server Error, Please try again later.",
 			"error":   err.Error(),
 		})
