@@ -5,14 +5,13 @@ import (
 	model "github.com/SJ22032003/go-ems/models"
 )
 
-
 func CreateEventService(event *model.Event) error {
 	query := `INSERT INTO events (title, description, location, date, user_id) VALUES (?, ?, ?, ?, ?)`
 	result, err := db.Execute(query, event.Title, event.Description, event.Location, event.Date, event.UserId)
 	if err != nil {
 		return err
 	}
-	
+
 	id, err := result.LastInsertId()
 	if err == nil {
 		event.ID = id
@@ -22,7 +21,7 @@ func CreateEventService(event *model.Event) error {
 
 func GetAllEventsService() ([]model.Event, error) {
 	var events = []model.Event{}
-	
+
 	rows, err := db.Query("SELECT * FROM events")
 	if err != nil {
 		return nil, err
@@ -41,10 +40,10 @@ func GetAllEventsService() ([]model.Event, error) {
 
 }
 
-func GetEventByIdService(id int64, user_id int64) (*model.Event, error) {
+func GetEventByIdService(id int64) (*model.Event, error) {
 	var event model.Event
 
-	row := db.DB.QueryRow("SELECT * FROM events WHERE id = ? AND user_id LIMIT 1", id, user_id)
+	row := db.DB.QueryRow("SELECT * FROM events WHERE id = ? LIMIT 1", id)
 
 	err := row.Scan(&event.ID, &event.Title, &event.Description, &event.Location, &event.Date, &event.UserId)
 	if err != nil {
@@ -65,4 +64,18 @@ func DeleteEventByIdService(id int64) error {
 	query := `DELETE FROM events WHERE id = ?`
 	_, err := db.Execute(query, id)
 	return err
+}
+
+func GetEventByUserId(eventId, userId int64) (*model.Event, error) {
+	var event = model.Event{}
+
+	rows := db.DB.QueryRow("SELECT * FROM events WHERE user_id = ? AND id = ? LIMIT 1", userId, eventId)
+
+	err := rows.Scan(&event.ID, &event.Title, &event.Description, &event.Location, &event.Date, &event.UserId)
+	if err != nil {
+		return &event, err
+	}
+	
+
+	return &event, nil
 }

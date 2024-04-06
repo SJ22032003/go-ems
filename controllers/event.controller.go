@@ -14,17 +14,17 @@ import (
 func GetEventById(ctx *gin.Context) {
 	id, err := strconv.ParseInt(ctx.Params.ByName("id"), 10, 64)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"message": "Bad Request, Please check the request parameter and try again.",
 			"error":   err.Error(),
 		})
 		return
 	}
 
-	event, err := service.GetEventByIdService(id, 1)
+	event, err := service.GetEventByIdService(id)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "Could not get event",
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message": "Could not get event, does not exist",
 			"error":   err.Error(),
 		})
 		return
@@ -42,7 +42,7 @@ func CreateEvents(ctx *gin.Context) {
 
 	err := ctx.ShouldBindJSON(&event)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"message": "Bad Request, Please check the request body and try again.",
 			"error":   err.Error(),
 		})
@@ -51,7 +51,7 @@ func CreateEvents(ctx *gin.Context) {
 
 	user, ok := ctx.Get("user")
 	if !ok {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"message": "Unauthorized",
 		})
 		return
@@ -64,7 +64,7 @@ func CreateEvents(ctx *gin.Context) {
 
 	err = service.CreateEventService(&event)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Internal Server Error, could not create event",
 		})
 		return
@@ -102,7 +102,7 @@ func UpdateEventById(ctx *gin.Context) {
 	// Get the id from the request parameter
 	id, err = strconv.ParseInt(ctx.Params.ByName("id"), 10, 64)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"message": "Bad Request, Please check the request parameter and try again.",
 			"error":   err.Error(),
 		})
@@ -111,7 +111,7 @@ func UpdateEventById(ctx *gin.Context) {
 
 	user, ok := ctx.Get("user")
 	if !ok {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"message": "Unauthorized",
 		})
 		return
@@ -120,9 +120,9 @@ func UpdateEventById(ctx *gin.Context) {
 	userId, _ := user.(jwt.MapClaims)["id"].(int64)
 
 	// Get the event by id
-	event, err = service.GetEventByIdService(id, userId)
+	event, err = service.GetEventByUserId(id, userId)
 	if err != nil { // If there is an error, return the error
-		ctx.JSON(http.StatusNotFound, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
 			"message": "Could not get event, does not exist or you do not have permission to access it.",
 			"error":   err.Error(),
 		})
@@ -132,7 +132,7 @@ func UpdateEventById(ctx *gin.Context) {
 	// Bind the request body to the event
 	err = ctx.ShouldBindJSON(event)
 	if err != nil { // If there is an error, return the error
-		ctx.JSON(http.StatusBadRequest, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"message": "Bad Request, Please check the body and try again.",
 			"error":   err.Error(),
 		})
@@ -141,7 +141,7 @@ func UpdateEventById(ctx *gin.Context) {
 
 	err = service.UpdateEventService(event)
 	if err != nil { // If there is an error, return the error
-		ctx.JSON(http.StatusInternalServerError, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Internal Server Error, could not update event",
 			"error":   err.Error(),
 		})
@@ -161,7 +161,7 @@ func DeleteEventById(ctx *gin.Context) {
 
 	id, err = strconv.ParseInt(ctx.Params.ByName("id"), 10, 64)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"message": "Bad Request, Please check the request parameter and try again.",
 			"error":   err.Error(),
 		})
@@ -170,7 +170,7 @@ func DeleteEventById(ctx *gin.Context) {
 
 	user, ok := ctx.Get("user")
 	if !ok {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"message": "Unauthorized",
 		})
 		return
@@ -178,10 +178,10 @@ func DeleteEventById(ctx *gin.Context) {
 
 	userId, _ := user.(jwt.MapClaims)["id"].(int64)
 
-	_, err = service.GetEventByIdService(id, userId)
+	_, err = service.GetEventByUserId(id, userId)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": "Could not get event",
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message": "Could not get event, does not exist or you do not have permission to access it.",
 			"error":   err.Error(),
 		})
 		return
@@ -189,7 +189,7 @@ func DeleteEventById(ctx *gin.Context) {
 
 	err = service.DeleteEventByIdService(id)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Internal Server Error, could not delete event",
 			"error":   err.Error(),
 		})
