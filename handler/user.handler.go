@@ -13,12 +13,10 @@ const (
 	USER_ALREADY_EXISTS_ERR = "UNIQUE constraint failed: users.email"
 )
 
-type UserHandler struct {
-	User model.User
-}
+type UserHandler struct {}
 
 func (u *UserHandler) CreateUser(ctx *gin.Context) {
-	user := u.User
+	user := model.User{}
 
 	err := ctx.ShouldBindJSON(&user)
 	if err != nil {

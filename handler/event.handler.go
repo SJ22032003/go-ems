@@ -1,4 +1,4 @@
-package controller
+package handler
 
 import (
 	"net/http"
@@ -11,7 +11,10 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GetEventById(ctx *gin.Context) {
+type EventHandler struct {}
+
+func (e *EventHandler) GetEventById(ctx *gin.Context) {
+	
 	id, err := strconv.ParseInt(ctx.Params.ByName("id"), 10, 64)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -34,10 +37,9 @@ func GetEventById(ctx *gin.Context) {
 		"message": "Success",
 		"event":   *event,
 	})
-
 }
 
-func CreateEvents(ctx *gin.Context) {
+func (e *EventHandler) CreateEvents(ctx *gin.Context) {
 	var event model.Event
 
 	err := ctx.ShouldBindJSON(&event)
@@ -77,10 +79,10 @@ func CreateEvents(ctx *gin.Context) {
 
 }
 
-func GetEvents(ctx *gin.Context) {
+func (e *EventHandler) GetEvents(ctx *gin.Context) {
 	events, err := service.GetAllEventsService()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Internal Server Error, could not get events",
 			"error":   err.Error(),
 		})
@@ -93,7 +95,7 @@ func GetEvents(ctx *gin.Context) {
 	})
 }
 
-func UpdateEventById(ctx *gin.Context) {
+func (e *EventHandler) UpdateEventById(ctx *gin.Context) {
 
 	var event *model.Event
 	var err error
@@ -155,7 +157,7 @@ func UpdateEventById(ctx *gin.Context) {
 
 }
 
-func DeleteEventById(ctx *gin.Context) {
+func (e *EventHandler) DeleteEventById(ctx *gin.Context) {
 	var err error
 	var id int64
 
