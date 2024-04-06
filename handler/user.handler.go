@@ -6,7 +6,7 @@ import (
 	model "github.com/SJ22032003/go-ems/models"
 	service "github.com/SJ22032003/go-ems/services"
 	util "github.com/SJ22032003/go-ems/utils"
-	user_templ "github.com/SJ22032003/go-ems/view/user"
+	auth_templ "github.com/SJ22032003/go-ems/view/auth/login"
 	gin "github.com/gin-gonic/gin"
 )
 
@@ -113,6 +113,6 @@ func (u *UserHandler) LoginUser(ctx *gin.Context) {
 }
 
 func (u *UserHandler) RenderLoginPage(ctx *gin.Context) {
-	render := util.NewTempl(ctx, http.StatusOK, user_templ.Login())
+	render := util.NewTempl(ctx, http.StatusOK, auth_templ.Login())
 	ctx.Render(http.StatusOK, render)
 }
