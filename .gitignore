@@ -1,0 +1,12 @@
+vendor/
+*.log
+*.test
+*.out
+.DS_Store
+.vscode/
+bin/
+*.exe
+*.exe~
+*.swp
+*.swo
+*.tmp
