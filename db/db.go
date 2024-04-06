@@ -17,8 +17,6 @@ func InitDB() {
 	DB.SetMaxOpenConns(10)
 	DB.SetMaxIdleConns(5)
 
-	DB.Exec("DELETE FROM events WHERE id = 1")
-
 	createTables()
 
 }
